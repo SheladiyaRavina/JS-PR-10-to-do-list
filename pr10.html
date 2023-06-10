@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>form</title>
+</head>
+<body style="background: linear-gradient(90deg, rgba(2, 0, 36, 0.858) 0%, rgba(9, 9, 121, 0.875) 35%, rgba(0, 213, 255, 0.824) 100%);">
+    <br><br>
+    <table border="5" cellpadding="8"  style="margin: auto; border: white;">
+        <input type="hidden" id="editid">
+        <tr>
+            <td><input type="text" id="name" style="width: 300px; height: 40px;"></td>
+            <td><input type="button" id="addbtn" value="+" onclick="save()" style="width: 50px; height: 40px;">
+                <input type="button" id="editbtn" value="Edit" onclick="save()"style="width: 50px; height: 40px;"></td>
+        </tr>
+    </table>
+    <br>
+    <table border="5"  style="margin: auto; background-color: aliceblue; border: white;">
+        <tbody id="record">
+        </tbody>
+        <tr>
+            <td><input type="button" value="clear" onclick="cleardata()" style="margin: auto; width:70px; height: 35px;"></td>
+        </tr>
+    </table>
+</body>
+</html>
+
+<script type="text/javascript">
+
+    let data = [];
+    const ViewData = () =>{
+        document.getElementById('editbtn').style.display="none";
+        document.getElementById('addbtn').style.display="block";
+
+        let val = (JSON.parse(localStorage.getItem('user'))== null) ? [] :JSON.parse(localStorage.getItem('user'));
+        let tbl="";
+
+        val.map((v)=>{
+            const{userId,name}=v;
+            tbl += `
+                    <tr>
+                        <td style = "font-size : 18px;">${name}</td>    
+                        <td><button onclick=datadelet(${userId}) style="width: 60px;height: 30px;">Delet</button>
+                            <button onclick=editData(${userId}) style="width: 60px;height: 30px;">Edit</button>
+                        </td> 
+                    </tr>
+                    `
+            });
+            document.getElementById('record').innerHTML=tbl;
+    }
+    ViewData();
+
+    let save = () =>{
+        let userId = document.getElementById('editid').value;
+        let name = document.getElementById('name').value;
+        let obj = {
+            userId : Math.floor(Math.random() *10000),
+            name :name,
+        }
+        if(userId){
+            let alldata = JSON.parse(localStorage.getItem('user'));
+
+            for(let i in alldata){
+                if(alldata[i].userId == userId){
+                    alldata[i].name=name;
+                }
+                localStorage.setItem('user',JSON.stringify(alldata));
+            }
+            alert("sucessfully update");
+            document.getElementById('editid').value="";
+            ViewData();
+        }else{
+            if(localStorage.getItem('user')===null || localStorage.getItem('user')=== undefined){
+                data.push(obj);
+                localStorage.setItem('user',JSON.stringify(data));
+            
+            }else{
+                let val=JSON.parse(localStorage.getItem('user'));
+                val.push(obj);
+                localStorage.setItem('user',JSON.stringify(val));
+            }
+        
+            alert("user seccessfully created.");
+            ViewData();
+        }
+
+        document.getElementById('name').value="";
+    }
+
+    let datadelet = (id) =>{
+     let alldata=JSON.parse(localStorage.getItem('user'));
+
+        let ans=alldata.filter((val)=>{
+            return val.userId != id
+        })
+
+        localStorage.setItem('user',JSON.stringify(ans));
+        alert("user successfully delet");
+        ViewData();
+    }
+
+    let editData = (id) =>{
+        document.getElementById("addbtn").style.display="none";
+        document.getElementById("editbtn").style.display="block";
+
+        let val= JSON.parse(localStorage.getItem('user'));
+        let ans = val.filter((v)=>{
+            return v.userId == id;
+        });
+        document.getElementById('name').value=ans[0].name;   
+        document.getElementById('editid').value= ans[0].userId;   
+            
+    }
+
+    let cleardata = () =>{
+        let alldata=JSON.parse(localStorage.getItem('user'));
+
+        let ans=alldata.filter((v)=>{
+            return v.name.value = "";
+        });
+
+        localStorage.setItem('user',JSON.stringify(ans));
+        alert("all data successfully delet");
+        ViewData();
+    }
+</script>
